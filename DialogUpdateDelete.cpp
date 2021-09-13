@@ -122,7 +122,7 @@ void DialogUpdateDelete::OnBtnUpdateClicked()
 			(CString)", Password=" + password + (CString)", Platform=" + platform + (CString)" WHERE DataID=" + dataID);
 
 		//Update LastAccessed table with the dataID thats been updated
-		dbControl.ExecuteSQLCommand((CString)"UPDATE LastAccessed SET LastAccessed=" +
+		dbControl.ExecuteSQLCommand((CString)"UPDATE LastAccessed SET LastAccess=" +
 			timeOperated + (CString)", LatestOperation='Updated' WHERE DataID=" + dataID);
 
 		MessageBox((CString)"Success updating data!", (CString)"Success", MB_OK);

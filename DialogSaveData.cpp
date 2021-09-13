@@ -116,7 +116,7 @@ void DialogSaveData::OnBtnSaveDataClicked()
 		timeOperated.Insert(0, '\''); timeOperated.Insert(timeOperated.GetLength() + 1, L"\', ");
 
 		//Insert into LastAccessed table
-		insert = ("INSERT INTO LastAccessed(DataID, LastAccessed, LatestOperation)");
+		insert = ("INSERT INTO LastAccessed(DataID, LastAccess, LatestOperation)");
 		values = _T(" VALUES(" + dataID  + timeOperated + (CString)"'Written')");
 		dbControl.ExecuteSQLCommand(insert + values);
 	}

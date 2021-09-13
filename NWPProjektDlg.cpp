@@ -183,7 +183,7 @@ void CNWPProjektDlg::OnBtnCreateTablesClicked()
 		(CString)"Surname TEXT(25)," + (CString)"Username TEXT(25), " + (CString)"Email TEXT(30)," + (CString)"Password TEXT(20)," +
 		(CString)"Platform TEXT(30))");
 
-	dbControl.ExecuteSQLCommand((CString)"CREATE TABLE LastAccessed(" + (CString)"DataID INTEGER, " + (CString)"LastAccessed TEXT(40), " +
+	dbControl.ExecuteSQLCommand((CString)"CREATE TABLE LastAccessed(" + (CString)"DataID INTEGER, " + (CString)"LastAccess TEXT(40), " +
 		(CString)"LatestOperation TEXT(10))");
 
 	MessageBox((CString)"Successfully created tables!", (CString)"Success", MB_OK);

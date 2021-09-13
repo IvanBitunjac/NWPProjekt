@@ -62,7 +62,7 @@ void DialogUpdateDelete::OnBtnDeleteClicked()
 		}
 
 		dbControl.ExecuteSQLCommand((CString)"DELETE * FROM UserData WHERE DataID=" + dataID);
-		dbControl.ExecuteSQLCommand((CString)"DELETE * FROM LastAccess WHERE DataID=" + dataID);
+		dbControl.ExecuteSQLCommand((CString)"DELETE * FROM LastAccessed WHERE DataID=" + dataID);
 		SetDlgItemText(IDC_EDIT_DATAIDDELETE, 0);
 		MessageBox((CString)"Success deleting data!", (CString)"Success", MB_OK);
 		recordset.Close();

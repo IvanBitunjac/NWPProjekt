@@ -5,6 +5,7 @@
 #include "NWPProjekt.h"
 #include "DialogRetrieveData.h"
 #include "afxdialogex.h"
+#include <string>
 
 
 // DialogRetrieveData dialog
@@ -31,7 +32,7 @@ void DialogRetrieveData::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(DialogRetrieveData, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SEARCH, &DialogRetrieveData::OnBtnSearchClicked)
 	ON_BN_CLICKED(IDC_BUTTON_BACK, &DialogRetrieveData::OnBtnBackClicked)
-	ON_BN_CLICKED(IDC_BUTTON_SEARCHALL, &DialogRetrieveData::OnBtnSearchAllClicked)
+	ON_BN_CLICKED(IDC_BUTTON_SEARCHALL, &DialogRetrieveData::OnBtnGetAllClicked)
 END_MESSAGE_MAP()
 
 
@@ -40,7 +41,7 @@ END_MESSAGE_MAP()
 
 void DialogRetrieveData::OnBtnSearchClicked()
 {
-	queryListbox.ResetContent();
+	//queryListbox.ResetContent();
 	DatabaseControl dbControl;
 	if (!dbControl.OpenConnection()) {
 		MessageBox((CString)"Could not connect to database!", (CString)"Error connecting", MB_OK);
@@ -48,7 +49,6 @@ void DialogRetrieveData::OnBtnSearchClicked()
 	}
 	CRecordset recordSet(&dbControl.database);
 	CRecordset recordLastAccess(&dbControl.database);
-	CString dataID, firstName, surname, username, email, password, platform, lastAccess, latestOp;
 	CString search;
 	GetDlgItemText(IDC_EDIT_SEARCH, search);
 	if (search == "") {
@@ -64,9 +64,11 @@ void DialogRetrieveData::OnBtnSearchClicked()
 		return;
 	}
 
+	queryListbox.ResetContent();
 
 	int listboxIndex = 0;
 	while (!recordSet.IsEOF()) {
+		CString dataID, firstName, surname, username, email, password, platform, lastAccess, latestOp;
 		recordSet.GetFieldValue(L"DataID", dataID);
 		recordSet.GetFieldValue(L"FirstName", firstName);
 		recordSet.GetFieldValue(L"Surname", surname);
@@ -76,10 +78,10 @@ void DialogRetrieveData::OnBtnSearchClicked()
 		recordSet.GetFieldValue(L"Platform", platform);
 
 		if (recordLastAccess.IsOpen()) recordLastAccess.Requery();
-		else recordLastAccess.Open(CRecordset::forwardOnly, (CString)"SELECT LastAccessed, LatestOperation FROM LastAccessed WHERE DataID=" +
+		else recordLastAccess.Open(CRecordset::forwardOnly, (CString)"SELECT LastAccess, LatestOperation FROM LastAccessed WHERE DataID=" +
 			dataID, CRecordset::readOnly);	
 
-		recordLastAccess.GetFieldValue(L"LastAccessed", lastAccess);
+		recordLastAccess.GetFieldValue(L"LastAccess", lastAccess);
 		recordLastAccess.GetFieldValue(L"LatestOperation", latestOp);
 
 		queryListbox.InsertString(listboxIndex, (CString)"DataID: " + dataID); ++listboxIndex;
@@ -96,6 +98,12 @@ void DialogRetrieveData::OnBtnSearchClicked()
 		queryListbox.InsertString(listboxIndex, (CString)"<---------------->"); ++listboxIndex;
 		queryListbox.InsertString(listboxIndex, (CString)""); ++listboxIndex;
 
+		//Get current time
+		auto time = std::chrono::system_clock::now();
+		std::time_t time_to_timet = std::chrono::system_clock::to_time_t(time);
+		CString timeOperated(std::ctime(&time_to_timet));
+		timeOperated.Insert(0, '\''); timeOperated.Insert(timeOperated.GetLength() + 1, L'\'');
+
 		recordSet.MoveNext();
 	}
 	recordSet.Close();
@@ -103,7 +111,7 @@ void DialogRetrieveData::OnBtnSearchClicked()
 	dbControl.CloseConnection();
 }
 
-void DialogRetrieveData::OnBtnSearchAllClicked()
+void DialogRetrieveData::OnBtnGetAllClicked()
 {
 	DatabaseControl dbControl;
 	if (!dbControl.OpenConnection()) {
@@ -135,10 +143,10 @@ void DialogRetrieveData::OnBtnSearchAllClicked()
 		recordSet.GetFieldValue(L"Platform", platform);
 
 		if (recordLastAccess.IsOpen()) recordLastAccess.Requery();
-		else recordLastAccess.Open(CRecordset::forwardOnly, (CString)"SELECT LastAccessed, LatestOperation FROM LastAccessed WHERE DataID=" +
+		else recordLastAccess.Open(CRecordset::forwardOnly, (CString)"SELECT LastAccess, LatestOperation FROM LastAccessed WHERE DataID=" +
 			dataID, CRecordset::readOnly);
 
-		recordLastAccess.GetFieldValue(L"LastAccessed", lastAccess);
+		recordLastAccess.GetFieldValue(L"LastAccess", lastAccess);
 		recordLastAccess.GetFieldValue(L"LatestOperation", latestOp);
 
 		queryListbox.InsertString(listboxIndex, (CString)"DataID: " + dataID); ++listboxIndex;

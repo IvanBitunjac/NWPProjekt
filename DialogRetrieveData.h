@@ -1,9 +1,12 @@
 #pragma once
+#pragma warning(disable : 4996) //For ctime deprecation warning
 
 #include "resource.h"
 #include "odbcinst.h"
 #include "afxdb.h"
 #include "DatabaseControl.h"
+#include <chrono>
+#include <ctime>
 
 
 // DialogRetrieveData dialog
@@ -29,5 +32,5 @@ public:
 	afx_msg void OnBtnSearchClicked();
 	afx_msg void OnBtnBackClicked();
 	CListBox queryListbox;
-	afx_msg void OnBtnSearchAllClicked();
+	afx_msg void OnBtnGetAllClicked();
 };

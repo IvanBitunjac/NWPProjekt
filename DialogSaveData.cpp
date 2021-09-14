@@ -45,6 +45,7 @@ void DialogSaveData::OnBtnBackClicked()
 void DialogSaveData::OnClose()
 {
 	CString editName, editSurname, editUsername, editEmail, editPassword, editPlatform;
+	CString message, caption;
 
 	//Get edit controls text
 	GetDlgItemText(IDC_EDIT_NAME, editName); GetDlgItemText(IDC_EDIT_SURNAME, editSurname); GetDlgItemText(IDC_EDIT_USERNAME, editUsername);
@@ -52,7 +53,9 @@ void DialogSaveData::OnClose()
 
 	//Check if any edit controls contain text
 	if (editName != "" || editSurname != "" || editUsername != "" || editEmail != "" || editPassword != "" || editPlatform != "") {
-		int result = MessageBox((CString)"Are you sure you want to close this dialog?", (CString)"Exit?", MB_YESNO);
+		message.LoadString(IDS_CLOSEDIALOGMSG);
+		caption.LoadString(IDS_EXIT);
+		int result = MessageBox(message, caption, MB_YESNO);
 		switch (result) {
 		case IDNO:
 			break;
@@ -72,18 +75,23 @@ void DialogSaveData::OnBtnSaveDataClicked()
 {
 	DatabaseControl dbControl;
 	CString firstName, surname, username, email, password, platform;
+	CString message, caption;
 
 	//Get all edit control values
 	GetDlgItemText(IDC_EDIT_NAME, firstName); GetDlgItemText(IDC_EDIT_SURNAME, surname); GetDlgItemText(IDC_EDIT_USERNAME, username);
 	GetDlgItemText(IDC_EDIT_EMAIL, email); GetDlgItemText(IDC_EDIT_PASSWORD, password); GetDlgItemText(IDC_EDIT_PLATFORM, platform);
 
 	if (!dbControl.OpenConnection()) { 
-		MessageBox((CString)"Error connecting to database", (CString)"Error", MB_OK);
+		message.LoadString(IDS_DBCONNECTERRORMSG);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		return;
 	}
 
 	if (platform == "") {
-		MessageBox((CString)"Platform or other values are empty", (CString)"Empty", MB_OK);
+		message.LoadString(IDS_PLATFORMOTHERSEMPTY);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		dbControl.CloseConnection();
 		return;
 	}
@@ -121,7 +129,9 @@ void DialogSaveData::OnBtnSaveDataClicked()
 		dbControl.ExecuteSQLCommand(insert + values);
 	}
 	else {
-		MessageBox((CString)"Could not open recordset!", (CString)"Error", MB_OK);
+		message.LoadString(IDS_RSOPENERROR);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		dbControl.CloseConnection();
 		recordset.Close();
 		return;
@@ -131,7 +141,9 @@ void DialogSaveData::OnBtnSaveDataClicked()
 	SetDlgItemText(IDC_EDIT_NAME, 0); SetDlgItemText(IDC_EDIT_SURNAME, 0); SetDlgItemText(IDC_EDIT_USERNAME, 0);
 	SetDlgItemText(IDC_EDIT_EMAIL, 0); SetDlgItemText(IDC_EDIT_PASSWORD, 0); SetDlgItemText(IDC_EDIT_PLATFORM, 0);
 
-	MessageBox((CString)"Successfully saved data", (CString)"Success", MB_OK);
+	message.LoadString(IDS_OKSAVEDATAMSG);
+	caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
+	MessageBox(message, caption, MB_OK);
 	recordset.Close();
 	dbControl.CloseConnection();
 }

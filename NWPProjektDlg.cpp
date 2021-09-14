@@ -163,14 +163,20 @@ HCURSOR CNWPProjektDlg::OnQueryDragIcon()
 void CNWPProjektDlg::OnBtnSaveDataClicked()
 {
 	DialogSaveData dlgSaveData;
-	if (dlgSaveData.DoModal() == -1) MessageBox((CString)"Could not open dialog!", (CString)"Error", MB_OK);
+	CString message, caption;
+	message.LoadString(IDS_DLGOPENERROR);
+	message.LoadString(IDS_CAPTIONERRORMSGBOX);
+	if (dlgSaveData.DoModal() == -1) MessageBox(message, caption, MB_OK);
 }
 
 
 void CNWPProjektDlg::OnBtnRetrieveDataClicked()
 {
 	DialogRetrieveData dlgRetrieveData;
-	if (dlgRetrieveData.DoModal() == -1) MessageBox((CString)"Could not open dialog", (CString)"Error", MB_OK);
+	CString message, caption;
+	message.LoadString(IDS_DLGOPENERROR);
+	message.LoadString(IDS_CAPTIONERRORMSGBOX);
+	if (dlgRetrieveData.DoModal() == -1) MessageBox(message, caption, MB_OK);
 }
 
 
@@ -178,6 +184,7 @@ void CNWPProjektDlg::OnBtnRetrieveDataClicked()
 void CNWPProjektDlg::OnBtnCreateTablesClicked()
 {
 	DatabaseControl dbControl;
+	CString message, caption;
 	dbControl.OpenConnection();
 	dbControl.ExecuteSQLCommand((CString)"CREATE TABLE UserData(" + (CString)"DataID AUTOINCREMENT, " + (CString)"FirstName TEXT(20), " +
 		(CString)"Surname TEXT(25)," + (CString)"Username TEXT(25), " + (CString)"Email TEXT(30)," + (CString)"Password TEXT(20)," +
@@ -186,7 +193,9 @@ void CNWPProjektDlg::OnBtnCreateTablesClicked()
 	dbControl.ExecuteSQLCommand((CString)"CREATE TABLE LastAccessed(" + (CString)"DataID INTEGER, " + (CString)"LastAccess TEXT(40), " +
 		(CString)"LatestOperation TEXT(10))");
 
-	MessageBox((CString)"Successfully created tables!", (CString)"Success", MB_OK);
+	message.LoadString(IDS_CREATETABLEOKMSG);
+	caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
+	MessageBox(message, caption, MB_OK);
 	dbControl.CloseConnection();
 }
 
@@ -194,5 +203,8 @@ void CNWPProjektDlg::OnBtnCreateTablesClicked()
 void CNWPProjektDlg::OnBtnUpdateDeleteClicked()
 {
 	DialogUpdateDelete dlgUpdateDelete;
-	if(dlgUpdateDelete.DoModal() == -1) MessageBox((CString)"Could not open dialog", (CString)"Error", MB_OK);
+	CString message, caption;
+	message.LoadString(IDS_DLGOPENERROR);
+	message.LoadString(IDS_CAPTIONERRORMSGBOX);
+	if (dlgUpdateDelete.DoModal() == -1) MessageBox(message, caption, MB_OK);
 }

@@ -42,20 +42,25 @@ void DialogUpdateDelete::OnBtnDeleteClicked()
 	DatabaseControl dbControl;
 	CString dataID;
 	GetDlgItemText(IDC_EDIT_DATAIDDELETE, dataID);
+	CString message, caption;
 	if (dbControl.OpenConnection()) {
 		CRecordset recordset(&dbControl.database);
 
 		//Open recordset and check if specified ID exists in database
 		if (recordset.Open(CRecordset::forwardOnly, (CString)"SELECT * FROM UserData WHERE DataID=" + dataID, CRecordset::readOnly)) {
 			if (recordset.IsEOF()) {
-				MessageBox((CString)"No data with such ID!", (CString)"Error", MB_OK);
+				message.LoadString(IDS_NODATAID);
+				caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+				MessageBox(message, caption, MB_OK);
 				recordset.Close();
 				dbControl.CloseConnection();
 				return;
 			}
 		}
 		else {
-			MessageBox((CString)"Could not open Recordset to check if specified ID exists!", (CString)"Error", MB_OK);
+			message.LoadString(IDS_RSOPENERROR);
+			caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+			MessageBox(message, caption, MB_OK);
 			recordset.Close();
 			dbControl.CloseConnection();
 			return;
@@ -64,17 +69,22 @@ void DialogUpdateDelete::OnBtnDeleteClicked()
 		dbControl.ExecuteSQLCommand((CString)"DELETE * FROM UserData WHERE DataID=" + dataID);
 		dbControl.ExecuteSQLCommand((CString)"DELETE * FROM LastAccessed WHERE DataID=" + dataID);
 		SetDlgItemText(IDC_EDIT_DATAIDDELETE, 0);
-		MessageBox((CString)"Success deleting data!", (CString)"Success", MB_OK);
+		message.LoadString(IDS_OKDELETEDATAMSG);
+		caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		recordset.Close();
 		dbControl.CloseConnection();
 		return;
 	}
-	MessageBox((CString)"Could not connect to database!", (CString)"Error connecting", MB_OK);
+	message.LoadString(IDS_DBCONNECTERRORMSG);
+	caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+	MessageBox(message, caption, MB_OK);
 }
 
 void DialogUpdateDelete::OnBtnUpdateClicked()
 {
 	DatabaseControl dbControl;
+	CString message, caption;
 	if (dbControl.OpenConnection()) {
 		CString dataID, firstName, surname, username, email, password, platform;
 		CRecordset recordset(&dbControl.database);
@@ -84,7 +94,10 @@ void DialogUpdateDelete::OnBtnUpdateClicked()
 		GetDlgItemText(IDC_EDIT_EMAILUPDATE, email); GetDlgItemText(IDC_EDIT_PASSWORDUPDATE, password);
 		GetDlgItemText(IDC_EDIT_PLATFORMUPDATE, platform);
 		if (dataID == "") {
-			MessageBox((CString)"DataID cannot be empty!", (CString)"Error", MB_OK);
+			
+			message.LoadString(IDS_DATAIDEMPTY);
+			caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+			MessageBox(message, caption, MB_OK);
 			return;
 		}
 		CString recordsetQuery("SELECT * FROM UserData WHERE DataID=");
@@ -98,7 +111,9 @@ void DialogUpdateDelete::OnBtnUpdateClicked()
 			if (platform == "") recordset.GetFieldValue(L"Platform", platform);
 		}
 		else {
-			MessageBox((CString)"Could not open Recordset!", (CString)"Error", MB_OK);
+			message.LoadString(IDS_RSOPENERROR);
+			caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+			MessageBox(message, caption, MB_OK);
 			return;
 		}
 
@@ -125,7 +140,9 @@ void DialogUpdateDelete::OnBtnUpdateClicked()
 		dbControl.ExecuteSQLCommand((CString)"UPDATE LastAccessed SET LastAccess=" +
 			timeOperated + (CString)", LatestOperation='Updated' WHERE DataID=" + dataID);
 
-		MessageBox((CString)"Success updating data!", (CString)"Success", MB_OK);
+		message.LoadString(IDS_OKUPDATEDATAMSG);
+		caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
+		MessageBox(message, caption, MB_OK);
 	}
 }
 

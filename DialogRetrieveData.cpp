@@ -43,8 +43,11 @@ void DialogRetrieveData::OnBtnSearchClicked()
 {
 	//queryListbox.ResetContent();
 	DatabaseControl dbControl;
+	CString message, caption;
 	if (!dbControl.OpenConnection()) {
-		MessageBox((CString)"Could not connect to database!", (CString)"Error connecting", MB_OK);
+		message.LoadString(IDS_DBCONNECTERRORMSG);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		return;
 	}
 	CRecordset recordSet(&dbControl.database);
@@ -52,13 +55,17 @@ void DialogRetrieveData::OnBtnSearchClicked()
 	CString search;
 	GetDlgItemText(IDC_EDIT_SEARCH, search);
 	if (search == "") {
-		MessageBox((CString)"Search is empty!", (CString)"Empty", MB_OK);
+		message.LoadString(IDS_SEARCHEMPTY);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		dbControl.CloseConnection();
 		return;
 	}
 	search.Insert(0, '\''); search.Insert(search.GetLength() + 1, '\'');
 	if (!recordSet.Open(CRecordset::forwardOnly, (CString)"SELECT * FROM UserData WHERE Platform=" + search, CRecordset::readOnly)) {
-		MessageBox((CString)"Cant open Recordset for UserData table!", (CString)"Error", MB_OK);
+		message.LoadString(IDS_RSOPENERROR);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		dbControl.CloseConnection();
 		recordSet.Close();
 		return;
@@ -94,9 +101,7 @@ void DialogRetrieveData::OnBtnSearchClicked()
 		queryListbox.InsertString(listboxIndex, (CString)"Last accessed: " + lastAccess); ++listboxIndex;
 		queryListbox.InsertString(listboxIndex, (CString)"Last operation: " + latestOp); ++listboxIndex;
 
-		queryListbox.InsertString(listboxIndex, (CString)""); ++listboxIndex;
 		queryListbox.InsertString(listboxIndex, (CString)"<---------------->"); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)""); ++listboxIndex;
 
 		//Get current time
 		auto time = std::chrono::system_clock::now();
@@ -114,8 +119,11 @@ void DialogRetrieveData::OnBtnSearchClicked()
 void DialogRetrieveData::OnBtnGetAllClicked()
 {
 	DatabaseControl dbControl;
+	CString message, caption;
 	if (!dbControl.OpenConnection()) {
-		MessageBox((CString)"Could not connect to database!", (CString)"Error connecting", MB_OK);
+		message.LoadString(IDS_DBCONNECTERRORMSG);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		return;
 	}
 	CRecordset recordSet(&dbControl.database);
@@ -126,7 +134,9 @@ void DialogRetrieveData::OnBtnGetAllClicked()
 	CRecordset recordset(&dbControl.database);
 
 	if (!recordSet.Open(CRecordset::forwardOnly, (CString)"SELECT * FROM UserData", CRecordset::readOnly)) {
-		MessageBox((CString)"Cant open Recordset for UserData table!", (CString)"Error", MB_OK);
+		message.LoadString(IDS_RSOPENERROR);
+		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+		MessageBox(message, caption, MB_OK);
 		dbControl.CloseConnection();
 		recordSet.Close();
 		return;
@@ -159,12 +169,11 @@ void DialogRetrieveData::OnBtnGetAllClicked()
 		queryListbox.InsertString(listboxIndex, (CString)"Last accessed: " + lastAccess); ++listboxIndex;
 		queryListbox.InsertString(listboxIndex, (CString)"Last operation: " + latestOp); ++listboxIndex;
 
-		queryListbox.InsertString(listboxIndex, (CString)""); ++listboxIndex;
 		queryListbox.InsertString(listboxIndex, (CString)"<---------------->"); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)""); ++listboxIndex;
 
 		recordSet.MoveNext();
 	}
+
 	recordSet.Close();
 	recordLastAccess.Close();
 	dbControl.CloseConnection();

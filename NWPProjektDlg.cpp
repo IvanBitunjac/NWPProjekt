@@ -180,8 +180,8 @@ void CNWPProjektDlg::OnBtnCreateTablesClicked()
 	DatabaseControl dbControl;
 	CString message, caption;
 	if (dbControl.OpenConnection()) {
-		CString createUserDataTable("CREATE TABLE UserData(DataID AUTOINCREMENT, FirstName TEXT(20), Surname TEXT(25), Username TEXT(25), Email TEXT(30), Password TEXT(20), Platform TEXT(30))");
-		CString createLastAccessedTable("CREATE TABLE LastAccessed(DataID INTEGER, LastAccess TEXT(40), LatestOperation TEXT(10))");
+		CString createUserDataTable = _T("CREATE TABLE UserData(DataID AUTOINCREMENT, FirstName TEXT(20), Surname TEXT(25), Username TEXT(25), Email TEXT(30), Password TEXT(20), Platform TEXT(30))");
+		CString createLastAccessedTable = _T("CREATE TABLE LastAccessed(DataID INTEGER, LastAccess TEXT(40), LatestOperation TEXT(10))");
 		
 		dbControl.ExecuteSQLCommand(createUserDataTable);
 		dbControl.ExecuteSQLCommand(createLastAccessedTable);

@@ -1,12 +1,11 @@
 #pragma once
-#pragma warning(disable : 4996) //For ctime deprecation warning
+
 
 #include "resource.h"
 #include "odbcinst.h"
 #include "afxdb.h"
 #include "DatabaseControl.h"
-#include <chrono>
-#include <ctime>
+
 
 
 // DialogRetrieveData dialog

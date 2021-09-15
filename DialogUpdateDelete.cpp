@@ -93,22 +93,22 @@ void DialogUpdateDelete::OnBtnUpdateClicked()
 		GetDlgItemText(IDC_EDIT_SURNAMEUPDATE, surname); GetDlgItemText(IDC_EDIT_USERNAMEUPDATE, username);
 		GetDlgItemText(IDC_EDIT_EMAILUPDATE, email); GetDlgItemText(IDC_EDIT_PASSWORDUPDATE, password);
 		GetDlgItemText(IDC_EDIT_PLATFORMUPDATE, platform);
-		if (dataID == "") {
+		if (dataID == _T("")) {
 			
 			message.LoadString(IDS_DATAIDEMPTY);
 			caption.LoadString(IDS_CAPTIONERRORMSGBOX);
 			MessageBox(message, caption, MB_OK);
 			return;
 		}
-		CString recordsetQuery("SELECT * FROM UserData WHERE DataID=");
+		CString recordsetQuery = _T("SELECT * FROM UserData WHERE DataID=");
 		if (recordset.Open(CRecordset::forwardOnly, recordsetQuery + dataID, CRecordset::readOnly)) {
 			//Check if any edit controls are empty, if yes set with values from DB so they dont become NULL
-			if (firstName == "") recordset.GetFieldValue(L"FirstName", firstName);
-			if (surname == "") recordset.GetFieldValue(L"Surname", surname);
-			if (username == "") recordset.GetFieldValue(L"Username", username);
-			if (email == "") recordset.GetFieldValue(L"Email", email);
-			if (password == "") recordset.GetFieldValue(L"Password", password);
-			if (platform == "") recordset.GetFieldValue(L"Platform", platform);
+			if (firstName == _T("")) recordset.GetFieldValue(L"FirstName", firstName);
+			if (surname == _T("")) recordset.GetFieldValue(L"Surname", surname);
+			if (username == _T("")) recordset.GetFieldValue(L"Username", username);
+			if (email == _T("")) recordset.GetFieldValue(L"Email", email);
+			if (password == _T("")) recordset.GetFieldValue(L"Password", password);
+			if (platform == _T("")) recordset.GetFieldValue(L"Platform", platform);
 		}
 		else {
 			message.LoadString(IDS_RSOPENERROR);
@@ -118,18 +118,16 @@ void DialogUpdateDelete::OnBtnUpdateClicked()
 		}
 
 		//Wrap values in ' ' so they can be used in UPDATE statement
-		firstName = '\'' + firstName + '\'';
-		surname = '\'' + surname + '\'';
-		username = '\'' + username + '\'';
-		email = '\'' + email + '\'';
-		password = '\'' + password + '\'';
-		platform = '\'' + platform + '\'';
+		firstName = _T('\'') + firstName + _T('\'');
+		surname = _T('\'') + surname + _T('\'');
+		username = _T('\'') + username + _T('\'');
+		email = _T('\'') + email + _T('\'');
+		password = _T('\'') + password + _T('\'');
+		platform = _T('\'') + platform + _T('\'');
 
 		//Get current time
-		auto time = std::chrono::system_clock::now();
-		std::time_t time_to_timet = std::chrono::system_clock::to_time_t(time);
-		CString timeOperated(std::ctime(&time_to_timet));
-		timeOperated = '\'' + timeOperated + '\'';
+		CString timeOperated = CTime::GetCurrentTime().Format(L"%A, %d %B %Y %H:%M");
+		timeOperated = _T('\'') + timeOperated + _T('\'');
 
 		//Update user data
 		dbControl.ExecuteSQLCommand((_T("UPDATE UserData SET FirstName=" + firstName) +

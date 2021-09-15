@@ -75,7 +75,7 @@ void DialogRetrieveData::SearchDatabase(SearchType searchType)
 	else {
 		CString search;
 		GetDlgItemText(IDC_EDIT_SEARCH, search);
-		search = '\'' + search + '\'';
+		search = _T('\'') + search + _T('\'');
 		if (!recordSet.Open(CRecordset::forwardOnly, _T("SELECT * FROM UserData WHERE Platform=") + search, CRecordset::readOnly)) {
 			message.LoadString(IDS_RSOPENERROR);
 			caption.LoadString(IDS_CAPTIONERRORMSGBOX);

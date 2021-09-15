@@ -1,9 +1,8 @@
 #pragma once
-#pragma warning(disable : 4996) //For ctime deprecation warning
+
 
 #include "DatabaseControl.h"
-#include <chrono>
-#include <ctime>
+
 
 // DialogUpdateDelete dialog
 

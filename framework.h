@@ -1,4 +1,5 @@
 #pragma once
+#define _CSTRING_DISABLE_NARROW_WIDE_CONVERSION
 
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers

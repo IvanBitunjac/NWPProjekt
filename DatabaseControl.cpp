@@ -6,8 +6,7 @@ DatabaseControl::DatabaseControl() : databaseConnection(_T("DSN=NWPProjekt")) {
 }
 
 bool DatabaseControl::OpenConnection() {
-	if (this->database.OpenEx(this->databaseConnection) != 0) return true;
-	return false;
+	return database.OpenEx(databaseConnection) != 0;
 }
 
 void DatabaseControl::CloseConnection() {
@@ -16,4 +15,8 @@ void DatabaseControl::CloseConnection() {
 
 void DatabaseControl::ExecuteSQLCommand(CString statement) {
 	database.ExecuteSQL(statement);
+}
+
+DatabaseControl::~DatabaseControl() {
+	CloseConnection();
 }

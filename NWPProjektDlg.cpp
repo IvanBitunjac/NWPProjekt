@@ -163,20 +163,14 @@ HCURSOR CNWPProjektDlg::OnQueryDragIcon()
 void CNWPProjektDlg::OnBtnSaveDataClicked()
 {
 	DialogSaveData dlgSaveData;
-	CString message, caption;
-	message.LoadString(IDS_DLGOPENERROR);
-	message.LoadString(IDS_CAPTIONERRORMSGBOX);
-	if (dlgSaveData.DoModal() == -1) MessageBox(message, caption, MB_OK);
+    dlgSaveData.DoModal();
 }
 
 
 void CNWPProjektDlg::OnBtnRetrieveDataClicked()
 {
 	DialogRetrieveData dlgRetrieveData;
-	CString message, caption;
-	message.LoadString(IDS_DLGOPENERROR);
-	message.LoadString(IDS_CAPTIONERRORMSGBOX);
-	if (dlgRetrieveData.DoModal() == -1) MessageBox(message, caption, MB_OK);
+	dlgRetrieveData.DoModal();
 }
 
 
@@ -185,26 +179,22 @@ void CNWPProjektDlg::OnBtnCreateTablesClicked()
 {
 	DatabaseControl dbControl;
 	CString message, caption;
-	dbControl.OpenConnection();
-	dbControl.ExecuteSQLCommand((CString)"CREATE TABLE UserData(" + (CString)"DataID AUTOINCREMENT, " + (CString)"FirstName TEXT(20), " +
-		(CString)"Surname TEXT(25)," + (CString)"Username TEXT(25), " + (CString)"Email TEXT(30)," + (CString)"Password TEXT(20)," +
-		(CString)"Platform TEXT(30))");
+	if (dbControl.OpenConnection()) {
+		CString createUserDataTable("CREATE TABLE UserData(DataID AUTOINCREMENT, FirstName TEXT(20), Surname TEXT(25), Username TEXT(25), Email TEXT(30), Password TEXT(20), Platform TEXT(30))");
+		CString createLastAccessedTable("CREATE TABLE LastAccessed(DataID INTEGER, LastAccess TEXT(40), LatestOperation TEXT(10))");
+		
+		dbControl.ExecuteSQLCommand(createUserDataTable);
+		dbControl.ExecuteSQLCommand(createLastAccessedTable);
 
-	dbControl.ExecuteSQLCommand((CString)"CREATE TABLE LastAccessed(" + (CString)"DataID INTEGER, " + (CString)"LastAccess TEXT(40), " +
-		(CString)"LatestOperation TEXT(10))");
-
-	message.LoadString(IDS_CREATETABLEOKMSG);
-	caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
-	MessageBox(message, caption, MB_OK);
-	dbControl.CloseConnection();
+		message.LoadString(IDS_CREATETABLEOKMSG);
+		caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
+		MessageBox(message, caption, MB_OK);
+	}
 }
 
 
 void CNWPProjektDlg::OnBtnUpdateDeleteClicked()
 {
 	DialogUpdateDelete dlgUpdateDelete;
-	CString message, caption;
-	message.LoadString(IDS_DLGOPENERROR);
-	message.LoadString(IDS_CAPTIONERRORMSGBOX);
-	if (dlgUpdateDelete.DoModal() == -1) MessageBox(message, caption, MB_OK);
+	dlgUpdateDelete.DoModal();
 }

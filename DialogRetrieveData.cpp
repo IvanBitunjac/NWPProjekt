@@ -41,83 +41,17 @@ END_MESSAGE_MAP()
 
 void DialogRetrieveData::OnBtnSearchClicked()
 {
-	//queryListbox.ResetContent();
-	DatabaseControl dbControl;
-	CString message, caption;
-	if (!dbControl.OpenConnection()) {
-		message.LoadString(IDS_DBCONNECTERRORMSG);
-		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
-		MessageBox(message, caption, MB_OK);
-		return;
-	}
-	CRecordset recordSet(&dbControl.database);
-	CRecordset recordLastAccess(&dbControl.database);
-	CString search;
-	GetDlgItemText(IDC_EDIT_SEARCH, search);
-	if (search == "") {
-		message.LoadString(IDS_SEARCHEMPTY);
-		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
-		MessageBox(message, caption, MB_OK);
-		dbControl.CloseConnection();
-		return;
-	}
-	search.Insert(0, '\''); search.Insert(search.GetLength() + 1, '\'');
-	if (!recordSet.Open(CRecordset::forwardOnly, (CString)"SELECT * FROM UserData WHERE Platform=" + search, CRecordset::readOnly)) {
-		message.LoadString(IDS_RSOPENERROR);
-		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
-		MessageBox(message, caption, MB_OK);
-		dbControl.CloseConnection();
-		recordSet.Close();
-		return;
-	}
-
-	queryListbox.ResetContent();
-
-	int listboxIndex = 0;
-	while (!recordSet.IsEOF()) {
-		CString dataID, firstName, surname, username, email, password, platform, lastAccess, latestOp;
-		recordSet.GetFieldValue(L"DataID", dataID);
-		recordSet.GetFieldValue(L"FirstName", firstName);
-		recordSet.GetFieldValue(L"Surname", surname);
-		recordSet.GetFieldValue(L"Username", username);
-		recordSet.GetFieldValue(L"Email", email);
-		recordSet.GetFieldValue(L"Password", password);
-		recordSet.GetFieldValue(L"Platform", platform);
-
-		if (recordLastAccess.IsOpen()) recordLastAccess.Requery();
-		else recordLastAccess.Open(CRecordset::forwardOnly, (CString)"SELECT LastAccess, LatestOperation FROM LastAccessed WHERE DataID=" +
-			dataID, CRecordset::readOnly);	
-
-		recordLastAccess.GetFieldValue(L"LastAccess", lastAccess);
-		recordLastAccess.GetFieldValue(L"LatestOperation", latestOp);
-
-		queryListbox.InsertString(listboxIndex, (CString)"DataID: " + dataID); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"FirstName: " + firstName); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Surname: " + surname); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Username: " + username); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"E-mail: " + email); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Password: " + password); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Platform: " + platform); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Last accessed: " + lastAccess); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Last operation: " + latestOp); ++listboxIndex;
-
-		queryListbox.InsertString(listboxIndex, (CString)"<---------------->"); ++listboxIndex;
-
-		//Get current time
-		auto time = std::chrono::system_clock::now();
-		std::time_t time_to_timet = std::chrono::system_clock::to_time_t(time);
-		CString timeOperated(std::ctime(&time_to_timet));
-		timeOperated.Insert(0, '\''); timeOperated.Insert(timeOperated.GetLength() + 1, L'\'');
-
-		recordSet.MoveNext();
-	}
-	recordSet.Close();
-	recordLastAccess.Close();
-	dbControl.CloseConnection();
+	SearchDatabase(SearchType::Specific);
 }
 
 void DialogRetrieveData::OnBtnGetAllClicked()
 {
+	SearchDatabase(SearchType::All);
+}
+
+// If searchType = All -> Get all records, if searchType = specific -> Get search text and then perform query
+void DialogRetrieveData::SearchDatabase(SearchType searchType)
+{
 	DatabaseControl dbControl;
 	CString message, caption;
 	if (!dbControl.OpenConnection()) {
@@ -127,23 +61,32 @@ void DialogRetrieveData::OnBtnGetAllClicked()
 		return;
 	}
 	CRecordset recordSet(&dbControl.database);
-	CRecordset recordLastAccess(&dbControl.database);
 	CString dataID, firstName, surname, username, email, password, platform, lastAccess, latestOp;
-
 	queryListbox.ResetContent();
-	CRecordset recordset(&dbControl.database);
 
-	if (!recordSet.Open(CRecordset::forwardOnly, (CString)"SELECT * FROM UserData", CRecordset::readOnly)) {
-		message.LoadString(IDS_RSOPENERROR);
-		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
-		MessageBox(message, caption, MB_OK);
-		dbControl.CloseConnection();
-		recordSet.Close();
-		return;
+	if (searchType == SearchType::All) {
+		if (!recordSet.Open(CRecordset::forwardOnly, _T("SELECT * FROM UserData"), CRecordset::readOnly)) {
+			message.LoadString(IDS_RSOPENERROR);
+			caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+			MessageBox(message, caption, MB_OK);
+			return;
+		}
+	}
+	else {
+		CString search;
+		GetDlgItemText(IDC_EDIT_SEARCH, search);
+		search = '\'' + search + '\'';
+		if (!recordSet.Open(CRecordset::forwardOnly, _T("SELECT * FROM UserData WHERE Platform=") + search, CRecordset::readOnly)) {
+			message.LoadString(IDS_RSOPENERROR);
+			caption.LoadString(IDS_CAPTIONERRORMSGBOX);
+			MessageBox(message, caption, MB_OK);
+			return;
+		}
 	}
 
 	int listboxIndex = 0;
 	while (!recordSet.IsEOF()) {
+		CRecordset recordLastAccess(&dbControl.database);
 		recordSet.GetFieldValue(L"DataID", dataID);
 		recordSet.GetFieldValue(L"FirstName", firstName);
 		recordSet.GetFieldValue(L"Surname", surname);
@@ -152,36 +95,29 @@ void DialogRetrieveData::OnBtnGetAllClicked()
 		recordSet.GetFieldValue(L"Password", password);
 		recordSet.GetFieldValue(L"Platform", platform);
 
-		if (recordLastAccess.IsOpen()) recordLastAccess.Requery();
-		else recordLastAccess.Open(CRecordset::forwardOnly, (CString)"SELECT LastAccess, LatestOperation FROM LastAccessed WHERE DataID=" +
-			dataID, CRecordset::readOnly);
+		recordLastAccess.Open(CRecordset::forwardOnly, _T("SELECT LastAccess, LatestOperation FROM LastAccessed WHERE DataID=" + dataID), CRecordset::readOnly);
 
 		recordLastAccess.GetFieldValue(L"LastAccess", lastAccess);
 		recordLastAccess.GetFieldValue(L"LatestOperation", latestOp);
 
-		queryListbox.InsertString(listboxIndex, (CString)"DataID: " + dataID); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"FirstName: " + firstName); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Surname: " + surname); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Username: " + username); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"E-mail: " + email); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Password: " + password); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Platform: " + platform); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Last accessed: " + lastAccess); ++listboxIndex;
-		queryListbox.InsertString(listboxIndex, (CString)"Last operation: " + latestOp); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("DataID: ") + dataID); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("FirstName: ") + firstName); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("Surname: ") + surname); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("Username: ") + username); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("E-mail: ") + email); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("Password: ") + password); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("Platform: ") + platform); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("Last accessed: ") + lastAccess); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("Last operation: ") + latestOp); ++listboxIndex;
 
-		queryListbox.InsertString(listboxIndex, (CString)"<---------------->"); ++listboxIndex;
+		queryListbox.InsertString(listboxIndex, _T("<---------------->")); ++listboxIndex;
 
 		recordSet.MoveNext();
 	}
-
-	recordSet.Close();
-	recordLastAccess.Close();
-	dbControl.CloseConnection();
 }
 
 void DialogRetrieveData::OnBtnBackClicked()
 {
-	// TODO: Add your control notification handler code here
-	this->EndDialog(0);
+	this->EndDialog(IDCANCEL);
 }
 

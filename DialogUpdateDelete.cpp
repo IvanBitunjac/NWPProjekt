@@ -47,7 +47,7 @@ void DialogUpdateDelete::OnBtnDeleteClicked()
 		CRecordset recordset(&dbControl.database);
 
 		//Open recordset and check if specified ID exists in database
-		if (recordset.Open(CRecordset::forwardOnly, (CString)"SELECT * FROM UserData WHERE DataID=" + dataID, CRecordset::readOnly)) {
+		if (recordset.Open(CRecordset::forwardOnly, _T("SELECT * FROM UserData WHERE DataID=") + dataID, CRecordset::readOnly)) {
 			if (recordset.IsEOF()) {
 				message.LoadString(IDS_NODATAID);
 				caption.LoadString(IDS_CAPTIONERRORMSGBOX);
@@ -66,8 +66,8 @@ void DialogUpdateDelete::OnBtnDeleteClicked()
 			return;
 		}
 
-		dbControl.ExecuteSQLCommand((CString)"DELETE * FROM UserData WHERE DataID=" + dataID);
-		dbControl.ExecuteSQLCommand((CString)"DELETE * FROM LastAccessed WHERE DataID=" + dataID);
+		dbControl.ExecuteSQLCommand(_T("DELETE * FROM UserData WHERE DataID=") + dataID);
+		dbControl.ExecuteSQLCommand(_T("DELETE * FROM LastAccessed WHERE DataID=") + dataID);
 		SetDlgItemText(IDC_EDIT_DATAIDDELETE, 0);
 		message.LoadString(IDS_OKDELETEDATAMSG);
 		caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
@@ -118,27 +118,26 @@ void DialogUpdateDelete::OnBtnUpdateClicked()
 		}
 
 		//Wrap values in ' ' so they can be used in UPDATE statement
-		firstName.Insert(0, '\''); firstName.Insert(firstName.GetLength() + 1, '\'');
-		surname.Insert(0, '\''); surname.Insert(surname.GetLength() + 1, '\'');
-		username.Insert(0, '\''); username.Insert(username.GetLength() + 1, '\'');
-		email.Insert(0, '\''); email.Insert(email.GetLength() + 1, '\'');
-		password.Insert(0, '\''); password.Insert(password.GetLength() + 1, '\'');
-		platform.Insert(0, '\''); platform.Insert(platform.GetLength() + 1, '\'');
+		firstName = '\'' + firstName + '\'';
+		surname = '\'' + surname + '\'';
+		username = '\'' + username + '\'';
+		email = '\'' + email + '\'';
+		password = '\'' + password + '\'';
+		platform = '\'' + platform + '\'';
 
 		//Get current time
 		auto time = std::chrono::system_clock::now();
 		std::time_t time_to_timet = std::chrono::system_clock::to_time_t(time);
 		CString timeOperated(std::ctime(&time_to_timet));
-		timeOperated.Insert(0, '\''); timeOperated.Insert(timeOperated.GetLength() + 1, L"\'");
+		timeOperated = '\'' + timeOperated + '\'';
 
 		//Update user data
-		dbControl.ExecuteSQLCommand((CString)"UPDATE UserData SET FirstName=" + firstName +
-			(CString)", Surname=" + surname + (CString)", Username=" + username + (CString)", Email=" + email +
-			(CString)", Password=" + password + (CString)", Platform=" + platform + (CString)" WHERE DataID=" + dataID);
+		dbControl.ExecuteSQLCommand((_T("UPDATE UserData SET FirstName=" + firstName) +
+			_T(", Surname=" + surname) + _T(", Username=" + username) + _T(", Email=" + email) +
+			_T(", Password=" + password) + _T(", Platform=" + platform) + _T(" WHERE DataID=" + dataID)));
 
 		//Update LastAccessed table with the dataID thats been updated
-		dbControl.ExecuteSQLCommand((CString)"UPDATE LastAccessed SET LastAccess=" +
-			timeOperated + (CString)", LatestOperation='Updated' WHERE DataID=" + dataID);
+		dbControl.ExecuteSQLCommand(_T("UPDATE LastAccessed SET LastAccess=" + timeOperated) + _T(", LatestOperation='Updated' WHERE DataID=" + dataID));
 
 		message.LoadString(IDS_OKUPDATEDATAMSG);
 		caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
@@ -156,6 +155,6 @@ void DialogUpdateDelete::OnClose()
 
 void DialogUpdateDelete::OnBtnBackClicked()
 {
-	PostMessage(WM_CLOSE, 0, 0);
+	EndDialog(IDCANCEL);
 }
 

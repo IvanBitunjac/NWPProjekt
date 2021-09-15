@@ -21,4 +21,5 @@ public:
 	//For operations such as CREATE TABLE, INSERT, ALTER TABLE, DELETE etc.
 	void ExecuteSQLCommand(CString statement);
 
+	~DatabaseControl();
 };

@@ -39,7 +39,7 @@ END_MESSAGE_MAP()
 
 void DialogSaveData::OnBtnBackClicked()
 {
-	PostMessage(WM_CLOSE, 0, 0);
+	EndDialog(IDCANCEL);
 }
 
 void DialogSaveData::OnClose()
@@ -92,25 +92,24 @@ void DialogSaveData::OnBtnSaveDataClicked()
 		message.LoadString(IDS_PLATFORMOTHERSEMPTY);
 		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
 		MessageBox(message, caption, MB_OK);
-		dbControl.CloseConnection();
 		return;
 	}
 
 	//Wrap values in ' ' so they can be used for INSERT query
-	firstName.Insert(0, '\''); firstName.Insert(firstName.GetLength() + 1, L"\', ");
-	surname.Insert(0, '\''); surname.Insert(surname.GetLength() + 1, L"\', ");
-	username.Insert(0, '\''); username.Insert(username.GetLength() + 1, L"\', ");
-	email.Insert(0, '\''); email.Insert(email.GetLength() + 1, L"\', ");
-	password.Insert(0, '\''); password.Insert(password.GetLength() + 1, L"\', ");
-	platform.Insert(0, '\''); platform.Insert(platform.GetLength() + 1, '\''); //Skip adding ',' on last edit
+	firstName = '\'' + firstName + '\'';
+	surname = '\'' + surname + '\'';
+	username = '\'' + username + '\'';
+	email = '\'' + email + '\'';
+	password = '\'' + password + '\'';
+	platform = '\'' + platform + '\'';
 
 	//Insert into UserData table
 	CString insert("INSERT INTO UserData(FirstName, Surname, Username, Password, Email, Platform)");
-	CString values = _T(" VALUES(" + firstName + surname + username + email + password + platform + ")");
+	CString values = _T(" VALUES(" + firstName + ", " + surname + ", " + username + ", " + email + ", " + password + ", " + platform + ")");
 	dbControl.ExecuteSQLCommand(insert + values);
 
 	CRecordset recordset(&dbControl.database);
-	if (recordset.Open(CRecordset::forwardOnly, (CString)"SELECT Last(DataID) as DataIDNum FROM UserData", CRecordset::readOnly)) {
+	if (recordset.Open(CRecordset::forwardOnly, _T("SELECT Last(DataID) as DataIDNum FROM UserData"), CRecordset::readOnly)) {
 		CString dataID;
 		recordset.GetFieldValue(L"DataIDNum", dataID);
 
@@ -120,20 +119,18 @@ void DialogSaveData::OnBtnSaveDataClicked()
 		CString timeOperated(ctime(&time_to_timet));
 
 		//Wrap values in ' ' so they can be used for INSERT query
-		dataID.Insert(0, '\''); dataID.Insert(dataID.GetLength() + 1, L"\', ");
-		timeOperated.Insert(0, '\''); timeOperated.Insert(timeOperated.GetLength() + 1, L"\', ");
+		dataID = '\'' + dataID + '\'';
+		timeOperated = '\'' + timeOperated + '\'';
 
 		//Insert into LastAccessed table
 		insert = ("INSERT INTO LastAccessed(DataID, LastAccess, LatestOperation)");
-		values = _T(" VALUES(" + dataID  + timeOperated + (CString)"'Written')");
+		values = _T(" VALUES(" + dataID + _T(", ") + timeOperated + _T(", ") + _T("'Written')"));
 		dbControl.ExecuteSQLCommand(insert + values);
 	}
 	else {
 		message.LoadString(IDS_RSOPENERROR);
 		caption.LoadString(IDS_CAPTIONERRORMSGBOX);
 		MessageBox(message, caption, MB_OK);
-		dbControl.CloseConnection();
-		recordset.Close();
 		return;
 	}
 	
@@ -144,6 +141,4 @@ void DialogSaveData::OnBtnSaveDataClicked()
 	message.LoadString(IDS_OKSAVEDATAMSG);
 	caption.LoadString(IDS_CAPTIONSUCCESSMSGBOX);
 	MessageBox(message, caption, MB_OK);
-	recordset.Close();
-	dbControl.CloseConnection();
 }

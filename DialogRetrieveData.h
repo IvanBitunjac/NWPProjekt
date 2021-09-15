@@ -18,6 +18,8 @@ class DialogRetrieveData : public CDialogEx
 public:
 	DialogRetrieveData(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~DialogRetrieveData();
+	enum class SearchType{All, Specific};
+	void SearchDatabase(SearchType searchType);
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
